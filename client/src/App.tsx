@@ -1,18 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import SearchAndListing from "./pages/searchAndListing";
 
 function App() {
-  const [message, setMessage] = useState("");
-
   useEffect(() => {
     fetch("/api")
       .then((response) => response.text())
-      .then((data) => setMessage(data))
+      .then((data) => {
+        console.log("API response:", data);
+      })
       .catch((error) => console.error("Error:", error));
   }, []);
 
   return (
     <div className="container">
-      <h1>{message}</h1>
+      <SearchAndListing />
     </div>
   );
 }
