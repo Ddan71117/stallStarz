@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Alert, Card, Row, Col, Container } from 'react-bootstrap';
 import { useAuth } from './AuthContext';
 
-const LoginForm = () => {
+const LoginForm: React.FC = () => {  // Add explicit type declaration
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -33,7 +33,7 @@ const LoginForm = () => {
     }
   };
 
-  return (
+  return (  // Make sure there's an explicit return statement
     <Container fluid className="p-0">
       <Row className="g-0 min-vh-100">
         {/* Image Section */}
@@ -41,10 +41,21 @@ const LoginForm = () => {
           <div 
             className="h-100 w-100"
             style={{
-              background: 'url("./images/LoginPic.jpg") center/cover no-repeat',
+              background: 'url("/api/placeholder/800/600") center/cover no-repeat',
               minHeight: '100vh'
             }}
           >
+            <div 
+              className="position-absolute top-0 start-0 w-100 h-100"
+              style={{
+                background: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))'
+              }}
+            >
+              <div className="d-flex flex-column justify-content-center h-100 text-white p-5">
+                <h2 className="fw-bold mb-3">Welcome Back!</h2>
+                <p className="fs-5">Log in to access your account and explore our services.</p>
+              </div>
+            </div>
           </div>
         </Col>
 
