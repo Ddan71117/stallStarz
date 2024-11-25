@@ -1,0 +1,1 @@
+// Fetch user's restrooms cards to display on favorites page.
