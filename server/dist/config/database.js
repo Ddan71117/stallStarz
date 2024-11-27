@@ -55,5 +55,4 @@ const connectDB = async () => {
 };
 exports.connectDB = connectDB;
 exports.default = sequelize;
-
 //# sourceMappingURL=database.js.map
