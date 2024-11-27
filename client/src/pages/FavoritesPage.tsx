@@ -1,0 +1,1 @@
+// Fetch user's favorite restrooms

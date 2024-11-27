@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Form, Button, Alert, Card, Row, Col } from 'react-bootstrap';
+import { Form, Button, Alert, Card, Row, Col, Container } from 'react-bootstrap';
 import { useAuth } from './AuthContext';
 
-const LoginForm = () => {
+const LoginForm: React.FC = () => {  // Add explicit type declaration
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -21,79 +21,108 @@ const LoginForm = () => {
     try {
       const result = await login(credentials);
       if (result.success) {
-        navigate('/search'); // Navigate to search page after successful login
+        navigate('/search');
       } else {
         setError(result.error || 'Login failed');
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Login error:', error);
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <Row>
-      <Col>
-        <Card className="shadow-sm border-0">
-          <Card.Body className="p-4 p-md-5">
-            <h4 className="fw-bold mb-4 text-center">Login to Your Account</h4>
-            
-            {error && (
-              <Alert variant="danger" className="mb-4">
-                {error}
-              </Alert>
-            )}
-
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
-                <Form.Label>Username</Form.Label>
-                <Form.Control
-                  size="lg"
-                  type="text"
-                  placeholder="Enter username"
-                  value={credentials.username}
-                  onChange={(e) => setCredentials({...credentials, username: e.target.value})}
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-4">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  size="lg"
-                  type="password"
-                  placeholder="Enter password"
-                  value={credentials.password}
-                  onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                  required
-                />
-              </Form.Group>
-
-              <div className="d-grid mb-4">
-                <Button
-                  size="lg"
-                  variant="primary"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading ? 'Logging in...' : 'Login'}
-                </Button>
+  return (  // Make sure there's an explicit return statement
+    <Container fluid className="p-0">
+      <Row className="g-0 min-vh-100">
+        {/* Image Section */}
+        <Col md={6} className="d-none d-md-block position-relative">
+          <div 
+            className="h-100 w-100"
+            style={{
+              background: 'url("/api/placeholder/800/600") center/cover no-repeat',
+              minHeight: '100vh'
+            }}
+          >
+            <div 
+              className="position-absolute top-0 start-0 w-100 h-100"
+              style={{
+                background: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))'
+              }}
+            >
+              <div className="d-flex flex-column justify-content-center h-100 text-white p-5">
+                <h2 className="fw-bold mb-3">Welcome Back!</h2>
+                <p className="fs-5">Log in to access your account and explore our services.</p>
               </div>
+            </div>
+          </div>
+        </Col>
 
-              <div className="text-center">
-                <p className="mb-0">
-                  Don't have an account?{' '}
-                  <Link to="/signup" className="text-decoration-none">
-                    Sign up here
-                  </Link>
-                </p>
-              </div>
-            </Form>
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
+        {/* Login Form Section */}
+        <Col md={6} className="d-flex align-items-center py-5">
+          <div className="w-100 px-4 px-md-5">
+            <Card className="border-0 bg-transparent">
+              <Card.Body>
+                <h4 className="fw-bold mb-4">Login to Your Account</h4>
+                
+                {error && (
+                  <Alert variant="danger" className="mb-4">
+                    {error}
+                  </Alert>
+                )}
+
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      size="lg"
+                      type="text"
+                      placeholder="Enter username"
+                      value={credentials.username}
+                      onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-4">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      size="lg"
+                      type="password"
+                      placeholder="Enter password"
+                      value={credentials.password}
+                      onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                      required
+                    />
+                  </Form.Group>
+
+                  <div className="d-grid mb-4">
+                    <Button
+                      size="lg"
+                      variant="primary"
+                      type="submit"
+                      disabled={loading}
+                    >
+                      {loading ? 'Logging in...' : 'Login'}
+                    </Button>
+                  </div>
+
+                  <div className="text-center">
+                    <p className="mb-0">
+                      Don't have an account?{' '}
+                      <Link to="/signup" className="text-decoration-none">
+                        Sign up here
+                      </Link>
+                    </p>
+                  </div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
