@@ -1,0 +1,23 @@
+.similar-restrooms-container {
+    display: flex;
+    gap: 10px; /* Adds space between the cards */
+  }
+  
+  .similar-restroom-card {
+    border: 1px solid red; /* For debugging (remove after testing) */
+    flex: 1; /* Ensure cards take equal width */
+    text-align: center;
+  }
+  
+  .similar-restroom-card img {
+    height: 200px; /* Fixed height for all images */
+    width: 100%; /* Ensure the image stretches to the card's width */
+    object-fit: cover; /* Crop images while maintaining aspect ratio */
+    border: 1px solid red; /* For debugging (remove after testing) */
+  }
+
+  .restroom-image {
+    height: 200px; /* Set a consistent height */
+    width: 100%; /* Ensure the image spans the width of the card */
+    object-fit: cover; /* Crop the image while maintaining its aspect ratio */
+  }

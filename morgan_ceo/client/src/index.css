@@ -1,0 +1,53 @@
+body {
+    overflow-x: hidden; /* Prevent horizontal scrolling on the page */
+  }
+  
+  .container {
+    max-width: 1200px;
+    overflow-x: hidden; /* Prevent horizontal scrolling within the container */
+  }
+  
+  .carousel {
+    overflow: hidden; /* Ensure the carousel doesn't stretch */
+  }
+  
+  .carousel-item {
+    height: 400px; /* Fixed height for the carousel container */
+    display: flex; /* Center align content */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Hide oversized content */
+  }
+  
+  .carousel img {
+    max-width: 100%; /* Prevent images from exceeding the container's width */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover; /* Crop images if necessary */
+  }
+  
+  .list-group-item {
+    font-size: 1rem;
+    padding: 15px;
+  }
+
+  * {
+    outline: 1px solid red; /* Adds a red border around every element */
+  }
+
+  .similar-restrooms-container {
+    display: flex;
+    gap: 10px; /* Adds space between the cards */
+  }
+  
+  .similar-restroom-card {
+    border: 1px solid red; /* For debugging (remove after testing) */
+    flex: 1; /* Ensure cards take equal width */
+    text-align: center;
+  }
+  
+  .similar-restroom-card img {
+    height: 200px; /* Fixed height for all images */
+    width: 100%; /* Ensure the image stretches to the card's width */
+    object-fit: cover; /* Crop images while maintaining aspect ratio */
+    border: 1px solid red; /* For debugging (remove after testing) */
+  }
