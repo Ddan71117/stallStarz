@@ -17,8 +17,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, '../../client/dist')));
+
 // Routes
 app.use('/api/auth', authRoutes);
+app.get('*', (_req, res) => {  // Changed 'req' to '_req'
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+});
 
 // Error handling
 app.use(errorHandler);
