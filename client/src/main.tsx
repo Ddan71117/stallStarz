@@ -10,8 +10,4 @@ if (root) {
       <App />
     </StrictMode>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 0ec2fd09444505d4ace1c3725d54f483aeb8257f
