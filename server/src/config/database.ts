@@ -1,35 +1,50 @@
-// server/src/config/database.ts
 import { Sequelize } from 'sequelize';
 import { logger } from '../utils/logger';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load environment variables from the correct path
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
-const sequelize = new Sequelize({
-  dialect: 'postgres',
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  logging: (msg) => logger.debug(msg),
-  dialectOptions: {
-    ssl: false,
-    client_encoding: 'utf8'
-  },
-  define: {
-    timestamps: true,
-    underscored: true,
-  },
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000
-  }
-});
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Render's DATABASE_URL
+const databaseUrl = "postgresql://stallstarz_user:GlaSKWgapYT3ZYftCcbhyUlq46uujZN8@dpg-ct38v3tumphs73dptgc0-a.oregon-postgres.render.com/stallstarz_db";
+
+let sequelize: Sequelize;
+
+if (isProduction) {
+  sequelize = new Sequelize(databaseUrl, {
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    },
+    define: {
+      timestamps: true,
+      underscored: true,
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
+    logging: (msg) => logger.debug(msg)
+  });
+} else {
+  // Local development configuration
+  sequelize = new Sequelize({
+    dialect: 'postgres',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    logging: (msg) => logger.debug(msg)
+  });
+}
 
 export const connectDB = async () => {
   try {

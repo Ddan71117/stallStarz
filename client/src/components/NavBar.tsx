@@ -25,7 +25,7 @@ const NavBar = () => {
           className="d-flex align-items-center fw-bold"
         >
           <i className="bi bi-shield-lock me-2"></i>
-          sTallStarz
+          stallStarz
         </Navbar.Brand>
         
         <Navbar.Toggle aria-controls="navbar-nav" />

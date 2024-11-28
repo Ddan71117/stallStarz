@@ -15,7 +15,11 @@ dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+app.use(express_1.default.static(path_1.default.join(__dirname, '../../client/dist')));
 app.use('/api/auth', authRoutes_1.default);
+app.get('*', (_req, res) => {
+    res.sendFile(path_1.default.join(__dirname, '../../client/dist/index.html'));
+});
 app.use(errorHandler_1.errorHandler);
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {

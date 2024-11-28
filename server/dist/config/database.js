@@ -9,29 +9,51 @@ const logger_1 = require("../utils/logger");
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
-const sequelize = new sequelize_1.Sequelize({
-    dialect: 'postgres',
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '5432'),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    logging: (msg) => logger_1.logger.debug(msg),
-    dialectOptions: {
-        ssl: false,
-        client_encoding: 'utf8'
-    },
-    define: {
-        timestamps: true,
-        underscored: true,
-    },
-    pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    }
-});
+const databaseUrl = "postgresql://stallstarz_user:GlaSKWgapYT3ZYftCcbhyUlq46uujZN8@dpg-ct38v3tumphs73dptgc0-a.oregon-postgres.render.com/stallstarz_db";
+let sequelize;
+if (process.env.NODE_ENV === 'production') {
+    sequelize = new sequelize_1.Sequelize(databaseUrl, {
+        dialect: 'postgres',
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false
+            }
+        },
+        logging: (msg) => logger_1.logger.debug(msg),
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
+        }
+    });
+}
+else {
+    sequelize = new sequelize_1.Sequelize({
+        dialect: 'postgres',
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT || '5432'),
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        logging: (msg) => logger_1.logger.debug(msg),
+        dialectOptions: {
+            ssl: false,
+            client_encoding: 'utf8'
+        },
+        define: {
+            timestamps: true,
+            underscored: true,
+        },
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
+        }
+    });
+}
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
@@ -55,5 +77,4 @@ const connectDB = async () => {
 };
 exports.connectDB = connectDB;
 exports.default = sequelize;
-
 //# sourceMappingURL=database.js.map
