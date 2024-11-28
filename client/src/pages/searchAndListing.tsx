@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import ListingContainer from "../components/listingContainer";
+import SearchResults from "../components/SearchResults";
+// import ListingContainer from "../components/listingContainer";
 
 function SearchAndListing() {
   const filter = (
@@ -53,6 +54,18 @@ function SearchAndListing() {
 
   const handleFilterSelect = (filter: string) => setSelectFilter(filter);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [submitQuery, setSubmitQuery] = useState("");
+
+  const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitQuery(searchQuery);
+  };
+
   return (
     <>
       <div>
@@ -62,8 +75,12 @@ function SearchAndListing() {
               className="me-auto"
               placeholder="Enter your location to find public restrooms in your viscinity..."
               style={{ border: "1px solid #444" }}
+              value={searchQuery}
+              onChange={handleSearchInput}
             />
-            <Button variant="primary">Search</Button>
+            <Button onClick={handleSearchSubmit} variant="primary">
+              Search
+            </Button>
             <div className="vr" />
             <DropdownButton id="dropdown-item-button" title={filter}>
               <Dropdown.Item onClick={toggleFilter}>
@@ -100,7 +117,7 @@ function SearchAndListing() {
         </form>
       </div>
       <div>
-        <ListingContainer />
+        <SearchResults query={submitQuery} />
       </div>
     </>
   );
