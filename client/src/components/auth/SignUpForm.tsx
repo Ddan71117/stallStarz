@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Alert, Card, Row, Col } from 'react-bootstrap';
+import { API_BASE_URL } from '../../utils/apiConfig';
 
 const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const SignUpForm = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,13 +36,15 @@ const SignUpForm = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         navigate('/login');
       } else {
-        const data = await response.json();
         setError(data.message || 'Signup failed');
       }
     } catch (error) {
+      console.error('Signup error:', error);
       setError('Network error occurred');
     } finally {
       setLoading(false);

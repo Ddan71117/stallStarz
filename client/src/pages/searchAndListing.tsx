@@ -65,20 +65,24 @@ function SearchAndListing() {
     e.preventDefault();
     setSubmitQuery(searchQuery);
   };
-
+  
   return (
     <>
       <div>
-        <form className="mt-5">
+        <form className="mt-5" onSubmit={handleSearchSubmit}>
           <Stack direction="horizontal" gap={3}>
             <Form.Control
               className="me-auto"
-              placeholder="Enter your location to find public restrooms in your viscinity..."
+              placeholder="Enter your location to find public restrooms in your vicinity..."
               style={{ border: "1px solid #444" }}
               value={searchQuery}
               onChange={handleSearchInput}
             />
-            <Button onClick={handleSearchSubmit} variant="primary">
+            <Button 
+              type="submit"
+              variant="primary"
+              onClick={handleSearchSubmit}  /* Keep onClick for button clicks */
+            >
               Search
             </Button>
             <div className="vr" />

@@ -1,36 +1,38 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path"));
-const database_1 = require("./config/database");
-const errorHandler_1 = require("./middleware/errorHandler");
-const logger_1 = require("./utils/logger");
-const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
-dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
-const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
-app.use(express_1.default.static(path_1.default.join(__dirname, '../../client/dist')));
-app.use('/api/auth', authRoutes_1.default);
-app.get('*', (_req, res) => {
-    res.sendFile(path_1.default.join(__dirname, '../../client/dist/index.html'));
-});
-app.use(errorHandler_1.errorHandler);
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import path from 'path';
+import { connectDB } from './config/database';
+import { errorHandler } from './middleware/errorHandler';
+import { logger } from './utils/logger';
+import authRoutes from './routes/authRoutes';
+dotenv.config({ path: path.join(process.cwd(), '.env') });
+const app = express();
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production'
+        ? 'https://stallstarz.onrender.com'
+        : 'http://localhost:5173',
+    credentials: true
+}));
+app.use(express.json());
+app.use('/api/auth', authRoutes);
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../../client/dist')));
+    app.get('*', (_req, res) => {
+        res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+    });
+}
+app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {
     try {
-        await (0, database_1.connectDB)();
+        await connectDB();
         app.listen(PORT, () => {
-            logger_1.logger.info(`Server running on port ${PORT}`);
+            logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
         });
     }
     catch (error) {
-        logger_1.logger.error('Failed to start server:', error);
+        logger.error('Failed to start server:', error);
         process.exit(1);
     }
 };

@@ -20,8 +20,12 @@ interface Results {
   title: string;
   coordinates: { lat: number; lon: number };
 }
-console.log("process...");
+
 function SearchResults({ query }: SearchResultsProps) {
+  
+  console.log("Component rendered with query:", query);
+  console.log("Environment API key:", import.meta.env.VITE_OPENCAGE_API_KEY);
+  
   const [searchData, setSearchData] = useState<Results[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{
@@ -30,42 +34,61 @@ function SearchResults({ query }: SearchResultsProps) {
   } | null>(null);
 
   const fetchData = useCallback(async () => {
+    console.log("fetchData called with query:", query);
     setError(null);
     try {
       const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
-      const apiKey = "07c816057971476cacff9911c96755b7";
-      // const apiUrl = process.env.REACT_APP_OPENCAGE_BASE_URL;
-      // const apiKey = process.env.REACT_APP_OPENCAGE_API;
+      const apiKey = import.meta.env.VITE_OPENCAGE_API_KEY;
+      
+      if (!query.trim()) {
+        console.log("Empty query, skipping API call");
+        return;
+      }
 
-      const url = `${apiUrl}?q=${encodeURIComponent(query)}&key=${apiKey}`;
+      const url = `${apiUrl}?q=${encodeURIComponent(query)}&key=${apiKey}&limit=5`;
+      console.log("Making request to:", url);
+
       const response = await fetch(url);
+      console.log("Response status:", response.status);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch data.");
+        const errorData = await response.json();
+        console.error("API error response:", errorData);
+        throw new Error(`Failed to fetch data: ${errorData.message || response.statusText}`);
       }
 
-      const data: { results: APIResult[] } = await response.json();
+      const data = await response.json();
+      console.log("API Response data:", data);
 
-      const results = data.results.map((item, index) => ({
-        id: index.toString(),
-        title: item.formatted,
-        coordinates: {
-          lat: item.geometry.lat,
-          lon: item.geometry.lon,
-        },
-      }));
+      if (data.results && data.results.length > 0) {
+        console.log("Found locations:", data.results.length);
+        const results = data.results.map((item: APIResult, index: number) => ({
+          id: index.toString(),
+          title: item.formatted,
+          coordinates: {
+            lat: item.geometry.lat,
+            lon: item.geometry.lon,
+          },
+        }));
 
-      if (results.length > 0) {
-        setLocation(results[0].coordinates);
+        console.log("Processed results:", results);
+        if (results.length > 0) {
+          setLocation(results[0].coordinates);
+        }
+        setSearchData(results);
+      } else {
+        console.log("No results found");
+        setSearchData([]);
       }
-      setSearchData(results);
     } catch (error) {
-      setError((error as Error).message);
+      console.error("Search error:", error);
+      setError(error instanceof Error ? error.message : "An error occurred");
     }
   }, [query]);
 
   useEffect(() => {
     if (query) {
+      console.log("Query changed, fetching new data:", query); // Debug log
       fetchData();
     }
   }, [fetchData, query]);
@@ -73,10 +96,15 @@ function SearchResults({ query }: SearchResultsProps) {
   return (
     <div>
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {!searchData.length && <p>No restrooms in your area.</p>}
+      {!searchData.length && query && <p>No locations found for your search.</p>}
+      {!query && <p>Enter a location to search for restrooms.</p>}
       <ul>
         {searchData.map((result) => (
-          <li key={result.id} onClick={() => setLocation(result.coordinates)}>
+          <li 
+            key={result.id} 
+            onClick={() => setLocation(result.coordinates)}
+            style={{ cursor: 'pointer', padding: '8px', margin: '4px 0' }}
+          >
             {result.title || "Unnamed result"}
           </li>
         ))}

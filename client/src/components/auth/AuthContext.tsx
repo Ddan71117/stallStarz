@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../utils/apiConfig.ts';
 
 interface User {
   id: string;
@@ -18,15 +19,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verify token on mount and set user if valid
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem('token');
-      console.log('Checking token:', token ? 'Token exists' : 'No token');
       
       if (token) {
         try {
-          const response = await fetch('http://localhost:3000/api/auth/verify', {
+          const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -35,13 +34,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
           
           const data = await response.json();
-          console.log('Token verification response:', data);
           
           if (response.ok && data.user) {
-            console.log('Setting user:', data.user);
             setUser(data.user);
           } else {
-            console.log('Invalid token, clearing...');
             localStorage.removeItem('token');
             setUser(null);
           }
@@ -59,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (credentials: { username: string; password: string }) => {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       const data = await response.json();
-      console.log('Login response:', data);
 
       if (response.ok && data.token) {
         localStorage.setItem('token', data.token);

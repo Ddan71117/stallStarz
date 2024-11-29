@@ -6,8 +6,8 @@ export interface AuthRequest extends Request {
 }
 
 export const auth = async (
-  req: AuthRequest, 
-  res: Response, 
+  req: AuthRequest,
+  res: Response,
   next: NextFunction
 ): Promise<void | Response> => {
   try {
