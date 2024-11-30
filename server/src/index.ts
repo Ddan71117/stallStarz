@@ -1,4 +1,3 @@
-// server/src/index.ts
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -14,16 +13,27 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://stallstarz.onrender.com'  // Update this with your Render URL
+    : 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '../../client/dist')));
-
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
-app.get('*', (_req, res) => {  // Changed 'req' to '_req'
-  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
-});
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, '../../client/dist')));
+
+  // Handle React routing, return all requests to React app
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+  });
+}
 
 // Error handling
 app.use(errorHandler);
@@ -37,7 +47,7 @@ const startServer = async () => {
     await connectDB();
     
     app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
+      logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);

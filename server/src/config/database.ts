@@ -7,13 +7,10 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Render's DATABASE_URL
-const databaseUrl = "postgresql://stallstarz_user:GlaSKWgapYT3ZYftCcbhyUlq46uujZN8@dpg-ct38v3tumphs73dptgc0-a.oregon-postgres.render.com/stallstarz_db";
-
 let sequelize: Sequelize;
 
-if (isProduction) {
-  sequelize = new Sequelize(databaseUrl, {
+if (isProduction && process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     dialectOptions: {
       ssl: {
@@ -24,25 +21,21 @@ if (isProduction) {
     define: {
       timestamps: true,
       underscored: true,
-    },
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    },
-    logging: (msg) => logger.debug(msg)
+    }
   });
 } else {
-  // Local development configuration
   sequelize = new Sequelize({
     dialect: 'postgres',
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    logging: (msg) => logger.debug(msg)
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || '',
+    database: 'auth_app',
+    logging: (msg) => logger.debug(msg),
+    define: {
+      timestamps: true,
+      underscored: true,
+    }
   });
 }
 
@@ -51,10 +44,10 @@ export const connectDB = async () => {
     await sequelize.authenticate();
     logger.info('Database connection established successfully');
     
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      logger.info('Database synced successfully');
-    }
+    // Sync database in both development and production
+    await sequelize.sync({ alter: true });
+    logger.info('Database synced successfully');
+    
   } catch (error) {
     logger.error('Unable to connect to the database:', error);
     if (error instanceof Error) {

@@ -21,3 +21,9 @@ node_modules/
 *.sln
 *.sw?
 .env
+
+
+.env
+.env.local
+node_modules
+dist

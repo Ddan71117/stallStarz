@@ -9,12 +9,14 @@ const User_1 = __importDefault(require("../models/User"));
 const signup = async (req, res) => {
     try {
         const { username, password } = req.body;
+        // Check if user exists
         const existingUser = await User_1.default.findOne({
             where: { username }
         });
         if (existingUser) {
             return res.status(400).json({ message: 'Username already exists' });
         }
+        // Create user - password hashing is handled by User model hooks
         const user = await User_1.default.create({
             username,
             password
@@ -36,16 +38,19 @@ exports.signup = signup;
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
+        // Find user
         const user = await User_1.default.findOne({
             where: { username }
         });
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+        // Use the model's comparePassword method
         const isValidPassword = await user.comparePassword(password);
         if (!isValidPassword) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+        // Generate token
         const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '24h' });
         return res.json({
             token,
@@ -64,7 +69,7 @@ exports.login = login;
 const verifyToken = async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
-        const token = authHeader === null || authHeader === void 0 ? void 0 : authHeader.replace('Bearer ', '');
+        const token = authHeader?.replace('Bearer ', '');
         if (!token) {
             return res.status(401).json({ message: 'No token provided' });
         }

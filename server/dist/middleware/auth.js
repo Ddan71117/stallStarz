@@ -8,7 +8,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
-        const token = authHeader === null || authHeader === void 0 ? void 0 : authHeader.replace('Bearer ', '');
+        const token = authHeader?.replace('Bearer ', '');
         if (!token) {
             return res.status(401).json({ message: 'Authentication required' });
         }

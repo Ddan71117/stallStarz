@@ -2,20 +2,27 @@ services:
   - type: web
     name: stallstarz
     env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    plan: free
+    buildCommand: |
+      npm install
+      cd client
+      npm install
+      npm run build
+      cd ../server 
+      npm install
+      npm run build
+    startCommand: |
+      cd server
+      npm run migrate
+      node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: DB_NAME
+      - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: VITE_OPENCAGE_API_KEY
+        sync: false
+    domains:
+      - stallstarz.onrender.com
