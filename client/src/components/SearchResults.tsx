@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { Row, Col, Alert } from "react-bootstrap";
+import RestroomCard from "./RestroomCard";
 import RestroomQuery from "./RestroomQuery";
 
 interface Geometry {
@@ -19,16 +21,19 @@ interface Results {
   id: string;
   title: string;
   coordinates: { lat: number; lon: number };
+  amenities: {
+    wheelchairAccess: boolean;
+    babyChanging: boolean;
+    unisex: boolean;
+  };
+  distance: string;
 }
 
-function SearchResults({ query }: SearchResultsProps) {
+const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   const [searchData, setSearchData] = useState<Results[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(
-    null
-  );
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number } | null>(null);
 
-  
   const fetchData = useCallback(async () => {
     setError(null);
     try {
@@ -37,9 +42,7 @@ function SearchResults({ query }: SearchResultsProps) {
 
       if (!query.trim()) return;
 
-      const url = `${apiUrl}?q=${encodeURIComponent(
-        query
-      )}&key=${apiKey}&limit=5`;
+      const url = `${apiUrl}?q=${encodeURIComponent(query)}&key=${apiKey}&limit=5`;
       console.log("Making request to:", url);
 
       const response = await fetch(url);
@@ -56,57 +59,78 @@ function SearchResults({ query }: SearchResultsProps) {
           id: index.toString(),
           title: item.formatted,
           coordinates: {
-            lat: item.geometry.lat, 
-            lon: item.geometry.lng, 
+            lat: item.geometry.lat,
+            lon: item.geometry.lng,
           },
+          amenities: {
+            wheelchairAccess: Math.random() > 0.5,
+            babyChanging: Math.random() > 0.5,
+            unisex: Math.random() > 0.5,
+          },
+          distance: `${(Math.random() * 5).toFixed(1)} miles`
         }));
 
         console.log("Mapped results:", results);
         setSearchData(results);
-        setLocation(results[0].coordinates);
+        setSelectedLocation(results[0].coordinates);
       } else {
         setSearchData([]);
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred.");
+      setError(error instanceof Error ? error.message : "An error occurred");
     }
   }, [query]);
 
-  
   useEffect(() => {
     if (query) fetchData();
   }, [fetchData, query]);
 
   const handleLocationClick = (coordinates: { lat: number; lon: number }) => {
     console.log("Location clicked:", coordinates);
-    setLocation(coordinates);
+    setSelectedLocation(coordinates);
   };
 
   return (
-    <div>
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {!searchData.length && query && <p>No locations found for your search.</p>}
-      {!query && <p>Enter a location to search for restrooms.</p>}
-      <ul>
+    <div className="p-4">
+      {error && (
+        <Alert variant="danger">{error}</Alert>
+      )}
+      
+      {!searchData.length && query && (
+        <Alert variant="info">No locations found for your search.</Alert>
+      )}
+      
+      {!query && (
+        <Alert variant="info">Enter a location to search for restrooms.</Alert>
+      )}
+
+      <Row xs={1} md={2} lg={3} className="g-4 mb-4">
         {searchData.map((result) => (
-          <li
-            key={result.id}
-            onClick={() => handleLocationClick(result.coordinates)}
-            style={{
-              cursor: "pointer",
-              color: "blue",
-              textDecoration: "underline",
-              padding: "8px",
-              margin: "4px 0",
-            }}
-          >
-            {result.title || "Unnamed result"}
-          </li>
+          <Col key={result.id}>
+            <RestroomCard
+              id={result.id}
+              name={result.title}
+              coordinates={result.coordinates}
+              distance={result.distance}
+              amenities={result.amenities}
+              onClick={handleLocationClick}
+            />
+          </Col>
         ))}
-      </ul>
-      {location && <RestroomQuery lat={location.lat} lon={location.lon} />}
+      </Row>
+
+      <style>
+        {`
+          .hover-card {
+            transition: transform 0.2s ease-in-out;
+          }
+          .hover-card:hover {
+            transform: translateY(-5px);
+          }
+        `}
+      </style>
     </div>
   );
-}
+};
 
 export default SearchResults;
