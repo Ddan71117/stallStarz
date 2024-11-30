@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-// Define the Restroom interface
 interface Restroom {
   id: string;
   name: string;
@@ -8,7 +7,11 @@ interface Restroom {
   lon: number;
 }
 
-// Define the RestroomResponse interface for the API response
+interface RestroomSearchProps {
+  lat: number;
+  lon: number;
+}
+
 interface RestroomResponse {
   elements: {
     id: number;
@@ -20,70 +23,38 @@ interface RestroomResponse {
   }[];
 }
 
-function RestroomQuery() {
+function RestroomQuery({ lat, lon }: RestroomSearchProps) {
   const [restrooms, setRestrooms] = useState<Restroom[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(
-    null
-  );
-  const [loadingLocation, setLoadingLocation] = useState(true);
 
-  // Fetch user's location using the Geolocation API
   useEffect(() => {
-    const fetchLocation = () => {
-      if (!navigator.geolocation) {
-        setError("Geolocation is not supported by your browser.");
-        setLoadingLocation(false);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-          setLoadingLocation(false);
-        },
-        () => {
-          setError("Unable to retrieve your location.");
-          setLoadingLocation(false);
-        }
-      );
-    };
-
-    fetchLocation();
-  }, []);
-
-  // Fetch restrooms when location is available
-  useEffect(() => {
-    if (location) {
+    if (lat && lon) {
       const fetchRestrooms = async () => {
         setError(null);
         try {
-          const bRoomQuery = `[out:json];
-          node["amenity"="toilets"](around:2000, ${location.lat}, ${location.lon});
-          out;`;
+          const query = `[out:json];
+            node["amenity"="toilets"](around:2000, ${lat}, ${lon});
+            out;`;
           const apiUrl = "https://overpass-api.de/api/interpreter";
-          const url = `${apiUrl}?data=${encodeURIComponent(bRoomQuery)}`;
+          const url = `${apiUrl}?data=${encodeURIComponent(query)}`;
 
+          console.log(`Fetching restrooms with lat: ${lat}, lon: ${lon}`);
+          console.log(`Request URL: ${url}`);
           const response = await fetch(url);
 
           if (!response.ok) {
-            throw new Error("Fetch restrooms failed.");
+            throw new Error("Failed to fetch restrooms.");
           }
 
           const data: RestroomResponse = await response.json();
+          console.log("Fetched restrooms data:", data);
 
-          // Filter out "Nameless Restroom" and transform data
-          const restrooms = data.elements
-            .filter((item) => item.tags.name) // Only keep restrooms with a name
-            .map((item) => ({
-              id: item.id.toString(),
-              name: item.tags.name!,
-              lat: item.lat,
-              lon: item.lon,
-            }));
+          const restrooms = data.elements.map((item) => ({
+            id: item.id.toString(),
+            name: item.tags.name || "Nameless Restroom",
+            lat: item.lat,
+            lon: item.lon,
+          }));
 
           setRestrooms(restrooms);
         } catch (error) {
@@ -92,22 +63,17 @@ function RestroomQuery() {
       };
       fetchRestrooms();
     }
-  }, [location]);
+  }, [lat, lon]);
 
   return (
     <div>
-      <h1>Nearby Restrooms</h1>
-      {loadingLocation && <p>Fetching your location...</p>}
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {!loadingLocation && !location && !error && (
-        <p>Unable to fetch location. Please enable location services.</p>
-      )}
-      {restrooms.length === 0 && !error && location && (
-        <p>No restrooms found in this area.</p>
+      {restrooms.length === 0 && !error && (
+        <p>No restrooms found near this location.</p>
       )}
       <ul>
         {restrooms.map((restroom) => (
-          <li key={restroom.id}>
+          <li key={restroom.id} style={{ margin: "10px 0" }}>
             <strong>{restroom.name}</strong>
           </li>
         ))}
