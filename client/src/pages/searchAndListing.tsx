@@ -1,130 +1,51 @@
-import { useState, ChangeEvent, FormEvent } from "react";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Stack from "react-bootstrap/Stack";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
+//Test change for git
+
+import { useState } from "react";
 import SearchResults from "../components/SearchResults";
-// import ListingContainer from "../components/listingContainer";
 
-function SearchAndListing() {
-  const filter = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      fill="currentColor"
-      className="bi bi-filter-circle-fill"
-      viewBox="0 0 16 16"
-    >
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M3.5 5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1 0-1M5 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m2 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
-    </svg>
-  );
+const SearchAndListing = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const filterAsc = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      fill="currentColor"
-      className="bi bi-sort-up"
-      viewBox="0 0 16 16"
-    >
-      <path d="M3.5 12.5a.5.5 0 0 1-1 0V3.707L1.354 4.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.5.5 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 3.707zm3.5-9a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z" />
-    </svg>
-  );
-  const filterDesc = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      fill="currentColor"
-      className="bi bi-sort-down"
-      viewBox="0 0 16 16"
-    >
-      <path d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z" />
-    </svg>
-  );
-
-  const [filterToggle, setFilterToggle] = useState<boolean>(false);
-
-  const toggleFilter = () => setFilterToggle((prev: boolean) => !prev);
-
-  const [selectFilter, setSelectFilter] = useState<string | null>(null);
-
-  const handleFilterSelect = (filter: string) => setSelectFilter(filter);
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [submitQuery, setSubmitQuery] = useState("");
-
-  const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const buttonStyle = {
+    background: 'rgb(105,11,62)',
+    backgroundImage: 'linear-gradient(90deg, rgba(105,11,62,1) 0%, rgba(95,50,68,1) 11%, rgba(22,72,92,1) 36%, rgba(18,73,93,1) 55%, rgba(245,134,36,1) 80%, rgba(105,11,62,1) 100%)',
+    border: 'none',
+    color: 'white',
+    transition: 'opacity 0.3s ease'
   };
 
-  const handleSearchSubmit = (e: FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitQuery(searchQuery);
+    const form = e.target as HTMLFormElement;
+    const queryInput = form["search"] as HTMLInputElement;
+    setSearchQuery(queryInput.value);
   };
-  
+
   return (
-    <>
-      <div>
-        <form className="mt-5" onSubmit={handleSearchSubmit}>
-          <Stack direction="horizontal" gap={3}>
-            <Form.Control
-              className="me-auto"
-              placeholder="Enter your location to find public restrooms in your vicinity..."
-              style={{ border: "1px solid #444" }}
-              value={searchQuery}
-              onChange={handleSearchInput}
+    <div className="bg-white">
+      <div className="p-3">
+        <form onSubmit={handleSearchSubmit}>
+          <div className="d-flex justify-content-center gap-2">
+            <input
+              type="text"
+              name="search"
+              placeholder="Search for a location"
+              className="form-control"
+              style={{ maxWidth: "400px" }}
             />
-            <Button 
-              type="submit"
-              variant="primary"
-              onClick={handleSearchSubmit}  /* Keep onClick for button clicks */
+            <button 
+              type="submit" 
+              className="btn"
+              style={buttonStyle}
             >
               Search
-            </Button>
-            <div className="vr" />
-            <DropdownButton id="dropdown-item-button" title={filter}>
-              <Dropdown.Item onClick={toggleFilter}>
-                {filterToggle ? (
-                  <>Sort by {filterAsc}</>
-                ) : (
-                  <>Sort by {filterDesc}</>
-                )}
-              </Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item
-                eventKey="1"
-                className={selectFilter === "1" ? "active" : ""}
-                onClick={() => handleFilterSelect("1")}
-              >
-                Distance
-              </Dropdown.Item>
-              <Dropdown.Item
-                eventKey="2"
-                className={selectFilter === "2" ? "active" : ""}
-                onClick={() => handleFilterSelect("2")}
-              >
-                Rating
-              </Dropdown.Item>
-              <Dropdown.Item
-                eventKey="3"
-                className={selectFilter === "3" ? "active" : ""}
-                onClick={() => handleFilterSelect("3")}
-              >
-                Number of Ratings
-              </Dropdown.Item>
-            </DropdownButton>
-          </Stack>
+            </button>
+          </div>
         </form>
       </div>
-      <div>
-        <SearchResults query={submitQuery} />
-      </div>
-    </>
+      <SearchResults query={searchQuery} />
+    </div>
   );
-}
+};
 
 export default SearchAndListing;
