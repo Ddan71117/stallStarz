@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+// Define the Restroom interface
 interface Restroom {
   id: string;
   name: string;
@@ -7,11 +8,7 @@ interface Restroom {
   lon: number;
 }
 
-interface RestroomSearchProps {
-  lat: number;
-  lon: number;
-}
-
+// Define the RestroomResponse interface for the API response
 interface RestroomResponse {
   elements: {
     id: number;
@@ -23,17 +20,49 @@ interface RestroomResponse {
   }[];
 }
 
-function RestroomQuery({ lat, lon }: RestroomSearchProps) {
+function RestroomQuery() {
   const [restrooms, setRestrooms] = useState<Restroom[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(
+    null
+  );
+  const [loadingLocation, setLoadingLocation] = useState(true);
 
+  // Fetch user's location using the Geolocation API
   useEffect(() => {
-    if (lat && lon) {
+    const fetchLocation = () => {
+      if (!navigator.geolocation) {
+        setError("Geolocation is not supported by your browser.");
+        setLoadingLocation(false);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+          setLoadingLocation(false);
+        },
+        () => {
+          setError("Unable to retrieve your location.");
+          setLoadingLocation(false);
+        }
+      );
+    };
+
+    fetchLocation();
+  }, []);
+
+  // Fetch restrooms when location is available
+  useEffect(() => {
+    if (location) {
       const fetchRestrooms = async () => {
         setError(null);
         try {
           const bRoomQuery = `[out:json];
-          node["amenity"="toilets"](around:2000, ${lat}, ${lon});
+          node["amenity"="toilets"](around:2000, ${location.lat}, ${location.lon});
           out;`;
           const apiUrl = "https://overpass-api.de/api/interpreter";
           const url = `${apiUrl}?data=${encodeURIComponent(bRoomQuery)}`;
@@ -46,12 +75,15 @@ function RestroomQuery({ lat, lon }: RestroomSearchProps) {
 
           const data: RestroomResponse = await response.json();
 
-          const restrooms = data.elements.map((item) => ({
-            id: item.id.toString(),
-            name: item.tags.name || "Nameless Restroom",
-            lat: item.lat,
-            lon: item.lon,
-          }));
+          // Filter out "Nameless Restroom" and transform data
+          const restrooms = data.elements
+            .filter((item) => item.tags.name) // Only keep restrooms with a name
+            .map((item) => ({
+              id: item.id.toString(),
+              name: item.tags.name!,
+              lat: item.lat,
+              lon: item.lon,
+            }));
 
           setRestrooms(restrooms);
         } catch (error) {
@@ -60,18 +92,23 @@ function RestroomQuery({ lat, lon }: RestroomSearchProps) {
       };
       fetchRestrooms();
     }
-  }, [lat, lon]);
+  }, [location]);
 
   return (
     <div>
+      <h1>Nearby Restrooms</h1>
+      {loadingLocation && <p>Fetching your location...</p>}
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {restrooms.length === 0 && !error && (
+      {!loadingLocation && !location && !error && (
+        <p>Unable to fetch location. Please enable location services.</p>
+      )}
+      {restrooms.length === 0 && !error && location && (
         <p>No restrooms found in this area.</p>
       )}
       <ul>
         {restrooms.map((restroom) => (
           <li key={restroom.id}>
-            {restroom.name} - Coordinates: {restroom.lat}, {restroom.lon}
+            <strong>{restroom.name}</strong>
           </li>
         ))}
       </ul>
