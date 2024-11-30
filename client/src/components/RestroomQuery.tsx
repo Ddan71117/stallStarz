@@ -65,21 +65,21 @@ function RestroomQuery({ lat, lon }: RestroomSearchProps) {
     }
   }, [lat, lon]);
 
-  return (
-    <div>
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {restrooms.length === 0 && !error && (
-        <p>No restrooms found near this location.</p>
-      )}
-      <ul>
-        {restrooms.map((restroom) => (
-          <li key={restroom.id} style={{ margin: "10px 0" }}>
-            <strong>{restroom.name}</strong>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  // return (
+  //   <div>
+  //     {error && <p style={{ color: "red" }}>Error: {error}</p>}
+  //     {restrooms.length === 0 && !error && (
+  //       <p>No restrooms found near this location.</p>
+  //     )}
+  //     <ul>
+  //       {restrooms.map((restroom) => (
+  //         <li key={restroom.id} style={{ margin: "10px 0" }}>
+  //           <strong>{restroom.name}</strong>
+  //         </li>
+  //       ))}
+  //     </ul>
+  //   </div>
+  // );
 }
 
 export default RestroomQuery;
