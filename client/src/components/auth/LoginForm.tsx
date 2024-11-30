@@ -88,14 +88,22 @@ const LoginForm: React.FC = () => {
                   </Form.Group>
 
                   <div className="d-grid mb-4">
-                    <Button
-                      size="lg"
-                      variant="primary"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      {loading ? 'Logging in...' : 'Login'}
-                    </Button>
+                  <Button
+                    size="lg"
+                    variant="primary"
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      background: 'rgb(105,11,62)',
+                      backgroundImage: 'linear-gradient(90deg, rgba(105,11,62,1) 0%, rgba(95,50,68,1) 11%, rgba(22,72,92,1) 36%, rgba(18,73,93,1) 55%, rgba(245,134,36,1) 80%, rgba(105,11,62,1) 100%)',
+                      border: 'none',
+                      transition: 'opacity 0.3s ease',
+                      opacity: loading ? 0.7 : 1
+                    }}
+                    className="text-white"
+                  >
+                    {loading ? 'Logging in...' : 'Login'}
+                  </Button>
                   </div>
 
                   <div className="text-center">

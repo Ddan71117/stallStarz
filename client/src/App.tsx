@@ -8,6 +8,7 @@ import Navbar from './components/NavBar';
 import LoginForm from './components/auth/LoginForm';
 import SignUpForm from './components/auth/SignUpForm';
 import SearchAndListing from "./pages/searchAndListing";
+import Footer from './components/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
@@ -61,6 +62,7 @@ const App = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Container>
+          <Footer />
         </div>
       </AuthProvider>
     </Router>
