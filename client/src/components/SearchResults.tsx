@@ -3,7 +3,7 @@ import RestroomQuery from "./RestroomQuery";
 
 interface Geometry {
   lat: number;
-  lon: number;
+  lng: number;
 }
 
 interface APIResult {
@@ -22,76 +22,65 @@ interface Results {
 }
 
 function SearchResults({ query }: SearchResultsProps) {
-  
-  console.log("Component rendered with query:", query);
-  console.log("Environment API key:", import.meta.env.VITE_OPENCAGE_API_KEY);
-  
   const [searchData, setSearchData] = useState<Results[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [location, setLocation] = useState<{
-    lat: number;
-    lon: number;
-  } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(
+    null
+  );
 
+  
   const fetchData = useCallback(async () => {
-    console.log("fetchData called with query:", query);
     setError(null);
     try {
       const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
       const apiKey = import.meta.env.VITE_OPENCAGE_API_KEY;
-      
-      if (!query.trim()) {
-        console.log("Empty query, skipping API call");
-        return;
-      }
 
-      const url = `${apiUrl}?q=${encodeURIComponent(query)}&key=${apiKey}&limit=5`;
+      if (!query.trim()) return;
+
+      const url = `${apiUrl}?q=${encodeURIComponent(
+        query
+      )}&key=${apiKey}&limit=5`;
       console.log("Making request to:", url);
 
       const response = await fetch(url);
-      console.log("Response status:", response.status);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API error response:", errorData);
-        throw new Error(`Failed to fetch data: ${errorData.message || response.statusText}`);
+        throw new Error("Failed to fetch data.");
       }
 
       const data = await response.json();
-      console.log("API Response data:", data);
+      console.log("API response data:", data);
 
       if (data.results && data.results.length > 0) {
-        console.log("Found locations:", data.results.length);
         const results = data.results.map((item: APIResult, index: number) => ({
           id: index.toString(),
           title: item.formatted,
           coordinates: {
-            lat: item.geometry.lat,
-            lon: item.geometry.lon,
+            lat: item.geometry.lat, 
+            lon: item.geometry.lng, 
           },
         }));
 
-        console.log("Processed results:", results);
-        if (results.length > 0) {
-          setLocation(results[0].coordinates);
-        }
+        console.log("Mapped results:", results);
         setSearchData(results);
+        setLocation(results[0].coordinates);
       } else {
-        console.log("No results found");
         setSearchData([]);
       }
     } catch (error) {
-      console.error("Search error:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "An error occurred.");
     }
   }, [query]);
 
+  
   useEffect(() => {
-    if (query) {
-      console.log("Query changed, fetching new data:", query); // Debug log
-      fetchData();
-    }
+    if (query) fetchData();
   }, [fetchData, query]);
+
+  const handleLocationClick = (coordinates: { lat: number; lon: number }) => {
+    console.log("Location clicked:", coordinates);
+    setLocation(coordinates);
+  };
 
   return (
     <div>
@@ -100,10 +89,16 @@ function SearchResults({ query }: SearchResultsProps) {
       {!query && <p>Enter a location to search for restrooms.</p>}
       <ul>
         {searchData.map((result) => (
-          <li 
-            key={result.id} 
-            onClick={() => setLocation(result.coordinates)}
-            style={{ cursor: 'pointer', padding: '8px', margin: '4px 0' }}
+          <li
+            key={result.id}
+            onClick={() => handleLocationClick(result.coordinates)}
+            style={{
+              cursor: "pointer",
+              color: "blue",
+              textDecoration: "underline",
+              padding: "8px",
+              margin: "4px 0",
+            }}
           >
             {result.title || "Unnamed result"}
           </li>

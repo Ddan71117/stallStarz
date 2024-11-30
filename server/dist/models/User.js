@@ -1,19 +1,24 @@
-import { Model, DataTypes } from 'sequelize';
-import bcrypt from 'bcrypt';
-import sequelize from '../config/database';
-class User extends Model {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const database_1 = __importDefault(require("../config/database"));
+class User extends sequelize_1.Model {
     async comparePassword(candidatePassword) {
-        return bcrypt.compare(candidatePassword, this.password);
+        return bcrypt_1.default.compare(candidatePassword, this.password);
     }
 }
 User.init({
     id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: sequelize_1.DataTypes.UUID,
+        defaultValue: sequelize_1.DataTypes.UUIDV4,
         primaryKey: true,
     },
     username: {
-        type: DataTypes.STRING,
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -22,7 +27,7 @@ User.init({
         },
     },
     password: {
-        type: DataTypes.STRING,
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         validate: {
             notEmpty: true,
@@ -30,21 +35,21 @@ User.init({
         },
     },
 }, {
-    sequelize,
+    sequelize: database_1.default,
     modelName: 'User',
     tableName: 'users',
     hooks: {
         beforeCreate: async (user) => {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(user.password, salt);
+            const salt = await bcrypt_1.default.genSalt(10);
+            user.password = await bcrypt_1.default.hash(user.password, salt);
         },
         beforeUpdate: async (user) => {
             if (user.changed('password')) {
-                const salt = await bcrypt.genSalt(10);
-                user.password = await bcrypt.hash(user.password, salt);
+                const salt = await bcrypt_1.default.genSalt(10);
+                user.password = await bcrypt_1.default.hash(user.password, salt);
             }
         },
     },
 });
-export default User;
+exports.default = User;
 //# sourceMappingURL=User.js.map
