@@ -5,27 +5,71 @@ interface Restroom {
   name: string;
   lat: number;
   lon: number;
+  amenities: {
+    wheelchairAccess: boolean;
+    flushToilet: boolean;
+    handwashing: boolean;
+    babyChanging: boolean;
+    unisex: boolean;
+    fee: boolean;
+    indoor: boolean;
+    maleFacilities: boolean;
+    femaleFacilities: boolean;
+  };
+  access?: string;
 }
 
 interface RestroomSearchProps {
   lat: number;
   lon: number;
+  onRestroomsFound?: (restrooms: Restroom[]) => void;
 }
 
 interface RestroomResponse {
   elements: {
+    type: string;
     id: number;
     lat: number;
     lon: number;
     tags: {
       name?: string;
+      amenity: string;
+      access?: string;
+      wheelchair?: 'yes' | 'no' | 'limited';
+      'toilets:disposal'?: 'flush' | 'chemical';
+      'toilets:handwashing'?: 'yes' | 'no';
+      'changing_table'?: 'yes' | 'no';
+      unisex?: 'yes' | 'no';
+      fee?: 'yes' | 'no';
+      level?: string;
+      male?: 'yes' | 'no';
+      female?: 'yes' | 'no';
+      indoor?: 'yes' | 'no';
     };
   }[];
 }
 
-function RestroomQuery({ lat, lon }: RestroomSearchProps) {
-  const [restrooms, setRestrooms] = useState<Restroom[]>([]);
+function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
   const [error, setError] = useState<string | null>(null);
+
+  const getAddress = async (lat: number, lon: number): Promise<string> => {
+    try {
+      const apiUrl = "https://api.opencagedata.com/geocode/v1/json";
+      const apiKey = import.meta.env.VITE_OPENCAGE_API_KEY;
+      const url = `${apiUrl}?q=${lat}+${lon}&key=${apiKey}&no_annotations=1`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        return data.results[0].formatted;
+      }
+      return "Address not found";
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Address not found";
+    }
+  };
 
   useEffect(() => {
     if (lat && lon) {
@@ -38,8 +82,6 @@ function RestroomQuery({ lat, lon }: RestroomSearchProps) {
           const apiUrl = "https://overpass-api.de/api/interpreter";
           const url = `${apiUrl}?data=${encodeURIComponent(query)}`;
 
-          console.log(`Fetching restrooms with lat: ${lat}, lon: ${lon}`);
-          console.log(`Request URL: ${url}`);
           const response = await fetch(url);
 
           if (!response.ok) {
@@ -47,39 +89,47 @@ function RestroomQuery({ lat, lon }: RestroomSearchProps) {
           }
 
           const data: RestroomResponse = await response.json();
-          console.log("Fetched restrooms data:", data);
+          console.log("Raw API Response:", data);
 
-          const restrooms = data.elements.map((item) => ({
-            id: item.id.toString(),
-            name: item.tags.name || "Nameless Restroom",
-            lat: item.lat,
-            lon: item.lon,
-          }));
+          // Process each restroom and get its address
+          const restroomsWithAddresses = await Promise.all(
+            data.elements.map(async (item) => {
+              const address = await getAddress(item.lat, item.lon);
+              return {
+                id: item.id.toString(),
+                name: item.tags.name || address, // Use address as fallback instead of coordinates
+                lat: item.lat,
+                lon: item.lon,
+                amenities: {
+                  wheelchairAccess: item.tags.wheelchair === 'yes',
+                  flushToilet: item.tags['toilets:disposal'] === 'flush',
+                  handwashing: item.tags['toilets:handwashing'] === 'yes',
+                  babyChanging: item.tags.changing_table === 'yes',
+                  unisex: item.tags.unisex === 'yes',
+                  fee: item.tags.fee === 'yes',
+                  indoor: item.tags.indoor === 'yes',
+                  maleFacilities: item.tags.male === 'yes',
+                  femaleFacilities: item.tags.female === 'yes'
+                },
+                access: item.tags.access || 'public'
+              };
+            })
+          );
 
-          setRestrooms(restrooms);
+          console.log("Processed restrooms:", restroomsWithAddresses);
+          if (onRestroomsFound) {
+            onRestroomsFound(restroomsWithAddresses);
+          }
         } catch (error) {
           setError((error as Error).message);
+          console.error("Error fetching restrooms:", error);
         }
       };
       fetchRestrooms();
     }
-  }, [lat, lon]);
+  }, [lat, lon, onRestroomsFound]);
 
-  // return (
-  //   <div>
-  //     {error && <p style={{ color: "red" }}>Error: {error}</p>}
-  //     {restrooms.length === 0 && !error && (
-  //       <p>No restrooms found near this location.</p>
-  //     )}
-  //     <ul>
-  //       {restrooms.map((restroom) => (
-  //         <li key={restroom.id} style={{ margin: "10px 0" }}>
-  //           <strong>{restroom.name}</strong>
-  //         </li>
-  //       ))}
-  //     </ul>
-  //   </div>
-  // );
+  return null;
 }
 
 export default RestroomQuery;

@@ -29,9 +29,9 @@ const SearchAndListing = () => {
             <input
               type="text"
               name="search"
-              placeholder="Search for a location"
+              placeholder="Search for a nearby restroom using street name and city."
               className="form-control"
-              style={{ maxWidth: "400px" }}
+              style={{ maxWidth: "450px" }}
             />
             <button 
               type="submit" 
