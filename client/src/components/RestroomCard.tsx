@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, Badge } from 'react-bootstrap';
+import React from "react";
+import { Card, Badge } from "react-bootstrap";
 
 interface RestroomCardProps {
   id: string;
@@ -21,13 +21,24 @@ interface RestroomCardProps {
     femaleFacilities: boolean;
   };
   access?: string;
+  onClick: (coordinates: { lat: number; lon: number }) => void;
 }
 
 const RestroomCard: React.FC<RestroomCardProps> = ({
   name,
   distance,
   coordinates,
-  amenities = {}
+  amenities = {
+    wheelchairAccess: false,
+    flushToilet: false,
+    handwashing: false,
+    babyChanging: false,
+    unisex: false,
+    fee: false,
+    indoor: false,
+    maleFacilities: false,
+    femaleFacilities: false,
+  },
 }) => {
   const getGoogleMapsUrl = () => {
     return `https://www.google.com/maps/dir/?api=1&destination=${coordinates.lat},${coordinates.lon}`;
@@ -42,7 +53,7 @@ const RestroomCard: React.FC<RestroomCardProps> = ({
         <Card.Text>
           <div className="d-flex align-items-center mb-2">
             <i className="bi bi-geo-alt me-2"></i>
-            {distance || 'Distance unknown'}
+            {distance || "Distance unknown"}
           </div>
         </Card.Text>
         <div className="d-flex gap-2 flex-wrap">
@@ -67,9 +78,9 @@ const RestroomCard: React.FC<RestroomCardProps> = ({
         </div>
       </Card.Body>
       <Card.Footer className="text-muted">
-        <a 
-          href={getGoogleMapsUrl()} 
-          target="_blank" 
+        <a
+          href={getGoogleMapsUrl()}
+          target="_blank"
           rel="noopener noreferrer"
           className="text-decoration-none"
         >

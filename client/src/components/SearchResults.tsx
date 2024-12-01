@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Row, Col, Alert, Pagination } from "react-bootstrap";
 import RestroomCard from "./RestroomCard";
 import RestroomQuery from "./RestroomQuery";
-import ReviewsAndRatings from "./reviewsAndRatings";
+// import ReviewsAndRatings from "./reviewsAndRatings"; Uncomment when ready to use.
 
 interface Geometry {
   lat: number;
@@ -44,7 +44,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   const [restroomData, setRestroomData] = useState<Restroom[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate pagination values
@@ -117,7 +120,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -149,15 +152,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       {totalPages > 1 && (
         <div className="d-flex justify-content-center mt-4">
           <Pagination>
-            <Pagination.First 
+            <Pagination.First
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1}
             />
-            <Pagination.Prev 
+            <Pagination.Prev
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             />
-            
+
             {/* Show page numbers */}
             {[...Array(totalPages)].map((_, index) => (
               <Pagination.Item
@@ -169,11 +172,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
               </Pagination.Item>
             ))}
 
-            <Pagination.Next 
+            <Pagination.Next
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             />
-            <Pagination.Last 
+            <Pagination.Last
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage === totalPages}
             />
@@ -182,8 +185,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       )}
 
       {selectedLocation && (
-        <RestroomQuery 
-          lat={selectedLocation.lat} 
+        <RestroomQuery
+          lat={selectedLocation.lat}
           lon={selectedLocation.lon}
           onRestroomsFound={handleRestroomsFound}
         />
