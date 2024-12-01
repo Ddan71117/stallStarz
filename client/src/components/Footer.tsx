@@ -13,7 +13,10 @@ const Footer: React.FC = () => {
   return (
     <footer 
       className="text-light py-3 mt-auto" 
-      style={gradientStyle}
+      style={{
+        ...gradientStyle,
+        zIndex: 1000  // Add this to ensure footer stays on top
+      }}
     >
       <div className="container text-center">
         <p className="mb-0">

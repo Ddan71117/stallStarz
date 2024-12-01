@@ -1,204 +1,137 @@
-<!-- # stallStarz
+# StallStarz - Restroom Finder Application 🚻
 
-![MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+StallStarz is a user-friendly web application designed to help users find nearby public restrooms with detailed amenity information and directions.
+
+## Live Demo
+[Visit StallStarz](https://stallstarz.onrender.com)
 
 ## Table of Contents
+1. [Features](#features)
+2. [Technologies Used](#technologies-used)
+3. [API Integrations](#api-integrations)
+4. [Screenshots](#screenshots)
+5. [Getting Started](#getting-started)
+6. [Project Structure](#project-structure)
+7. [Authentication](#authentication)
+8. [API Routes](#api-routes)
 
-1. [Description](#description)
-2. [Installation](#installation)
-3. [Usage](#usage)
-4. [Tests](#tests)
-5. [Contributing](#contributing)
-6. [Questions](#questions)
-7. [License](#license)
+## Features
+- User authentication (signup/login)
+- Location-based restroom search
+- Detailed amenity information for each restroom
+- Distance calculation from search location
+- Integrated directions via Google Maps
+- Mobile responsive design
+- Pagination for search results
 
-## Description
+## Technologies Used
+- **Frontend**:
+  - React
+  - TypeScript
+  - React Bootstrap
+  - React Router
+  - JWT Authentication
+  
+- **Backend**:
+  - Node.js
+  - Express
+  - PostgreSQL
+  - Sequelize ORM
+  - JWT for authentication
 
-An app that allows users to find, rate, and review local bathrooms.
+## API Integrations
+- OpenCage Geocoding API for location search
+- Overpass API for restroom data
+- Google Maps for directions
 
-## Installation
+## Screenshots
+[Add actual screenshots of your application here]
+- Login Page
+![alt text](image.png)
+- Sign Up Page
+![alt text](image-1.png)
+- Search Page
+![alt text](image-2.png)
+- Restroom Listings
+![alt text](image-3.png)
+- Rating and Review View
 
-## Usage
+## Getting Started
+1. Clone the repository
+```bash
+git clone [https://github.com/Ddan71117/stallStarz]
+```
 
-## Tests
+2. Install dependencies
+```bash
+# Install root dependencies
+npm install
 
-## Contributing
+# Install client dependencies
+cd client
+npm install
 
-## Questions
+# Install server dependencies
+cd ../server
+npm install
+```
+
+3. Set up environment variables
+```env
+# Server .env
+NODE_ENV=development
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=auth_app
+JWT_SECRET=your_secret
+
+# Client .env
+VITE_OPENCAGE_API_KEY=your_api_key
+```
+
+4. Start the development servers
+```bash
+# Root directory
+npm run dev
+```
+
+## Project Structure
+```
+stallstarz/
+├── client/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── utils/
+│   └── public/
+└── server/
+    ├── src/
+    │   ├── controllers/
+    │   ├── middleware/
+    │   ├── models/
+    │   └── routes/
+    └── config/
+```
+
+## Authentication
+- JWT-based authentication
+- Protected routes for authenticated users
+- Token verification for API requests
+
+## API Routes
+- **Auth Routes**:
+  - POST `/api/auth/signup` - Create new account
+  - POST `/api/auth/login` - User login
+  - GET `/api/auth/verify` - Verify JWT token
 
 ## License
+MIT License
 
-[MIT](https://opensource.org/licenses/MIT) -->
+## Contact Information
 
-## Description
-
-stallStarz is a modern web application that allows users to find, rate, and review public bathrooms. Whether you are traveling or in a new area, StallStarz provides a comprehensive database of user-reviewed restrooms, helping you make informed decisions. Key features include:
-
-- **Search by Location**: Find restrooms near your current location or search by address.
-- **Ratings and Reviews**: Browse user reviews and ratings for cleanliness, accessibility, and amenities.
-- **Contribute**: Add new bathroom locations, leave reviews, and rate facilities.
-- **Interactive Map**: Visualize nearby restrooms on an intuitive map interface.
-
-The app is designed to enhance convenience and comfort for travelers, parents, and individuals with specific accessibility needs.
-
----
-
-## Installation
-
-### Prerequisites
-
-Before installing, ensure you have the following:
-
-- **Node.js** (v16 or higher)
-- **npm** (v8 or higher)
-- A modern web browser
-
-### Steps to Install
-
-1. Clone the repository:
-
-   ```
-   git clone https://github.com/yourusername/stallstarz.git
-   ```
-
-2. Navigate to the project directory:
-
-   ```
-   cd stallstarz
-   ```
-
-3. Install the dependencies:
-
-   ```
-   npm install
-   ```
-
-4. Set up environment variables:
-
-   - Create a `.env` file in the root directory.
-   - Add the required API keys and configuration details:
-
-     ```
-     PORT=3000
-
-     DB_HOST=localhost
-
-     DB_PORT=5432
-
-     DB_USERNAME=postgres
-
-     DB_PASSWORD=
-
-     DB_NAME=auth_app
-
-     JWT_SECRET=
-
-     NODE_ENV=development
-     ```
-
-5. (Optional) Seed the database with sample data:
-
-   ```
-   npm run seed
-   ```
-
----
-
-## Usage
-
-### Running the App Locally
-
-1. Start the development server:
-
-   ```
-   npm start
-   ```
-
-2. Open a browser and visit:
-
-   ```
-   http://localhost:3000
-   ```
-
-### Features
-
-- **Search Bathrooms**: Use the search bar or the map interface to find bathrooms near you.
-- **Submit Reviews**: Click on a bathroom location to submit a review and rate its cleanliness, accessibility, and amenities.
-- **Interactive Map**: Pan, zoom, and explore bathroom locations in your area.
-
----
-
-## Tests
-
-Testing is essential to ensure the app runs reliably. The project includes unit and integration tests.
-
-### Running Tests
-
-1. To run all tests:
-
-   ```
-   npm test
-   ```
-
-2. For detailed test output:
-
-   ```
-   npm run test:verbose
-   ```
-
----
-
-## Contributing
-
-Contributions are welcome! Follow these steps to contribute to the project:
-
-1. **Fork the Repository**:
-
-   - Click the "Fork" button on the project GitHub page.
-
-2. **Clone the Forked Repository**:
-
-   ```
-   git clone https://github.com/yourusername/stallstarz.git
-   ```
-
-3. **Create a Feature Branch**:
-
-   ```
-   git checkout -b feature/your-feature-name
-   ```
-
-4. **Make Changes and Commit**:
-
-   - Follow coding standards and write descriptive commit messages:
-
-     ```
-     git commit -m "Add feature: your feature description"
-     ```
-
-5. **Push Changes**:
-
-   ```
-   git push origin feature/your-feature-name
-   ```
-
-6. **Submit a Pull Request**:
-
-   - Go to the original repository on GitHub and click "New Pull Request."
-
-### Contribution Guidelines
-
-- Adhere to the project's coding standards.
-- Test your changes before submitting.
-- Document new features in the README.
-
----
-
-## Questions
-
-For questions, feedback, or support, feel free to reach out:
-
-- **GitHub**: [yourusername](https://github.com/yourusername)
-- **Email**: your-email@example.com
-
----
+For support or inquiries:
+- Developer: Daniel Drennen, Parker Miksell, Morgan, Calvin Irwin and Amit Nandy
+- GitHub: https://github.com/Ddan71117
