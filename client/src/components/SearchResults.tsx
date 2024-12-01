@@ -97,45 +97,42 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   };
 
   return (
-    // <div className="p-4">
-    //   {error && <Alert variant="danger">{error}</Alert>}
+    <div className="p-4">
+      {error && <Alert variant="danger">{error}</Alert>}
 
-    //   {!searchData.length && query && (
-    //     <Alert variant="info">No locations found for your search.</Alert>
-    //   )}
+      {!searchData.length && query && (
+        <Alert variant="info">No locations found for your search.</Alert>
+      )}
 
-    //   {!query && (
-    //     <Alert variant="info">Enter a location to search for restrooms.</Alert>
-    //   )}
+      {!query && (
+        <Alert variant="info">Enter a location to search for restrooms.</Alert>
+      )}
 
-    //   <Row xs={1} md={2} lg={3} className="g-4 mb-4">
-    //     {searchData.map((result) => (
-    //       <Col key={result.id}>
-    //         <RestroomCard
-    //           id={result.id}
-    //           name={result.title}
-    //           coordinates={result.coordinates}
-    //           distance={result.distance}
-    //           amenities={result.amenities}
-    //           onClick={handleLocationClick}
-    //         />
-    //       </Col>
-    //     ))}
-    //   </Row>
+      <Row xs={1} md={2} lg={3} className="g-4 mb-4">
+        {searchData.map((result) => (
+          <Col key={result.id}>
+            <RestroomCard
+              id={result.id}
+              name={result.title}
+              coordinates={result.coordinates}
+              distance={result.distance}
+              amenities={result.amenities}
+              onClick={handleLocationClick}
+            />
+          </Col>
+        ))}
+      </Row>
 
-    //   <style>
-    //     {`
-    //       .hover-card {
-    //         transition: transform 0.2s ease-in-out;
-    //       }
-    //       .hover-card:hover {
-    //         transform: translateY(-5px);
-    //       }
-    //     `}
-    //   </style>
-    // </div>
-    <div>
-      <ReviewsAndRatings />
+      <style>
+        {`
+          .hover-card {
+            transition: transform 0.2s ease-in-out;
+          }
+          .hover-card:hover {
+            transform: translateY(-5px);
+          }
+        `}
+      </style>
     </div>
   );
 };
