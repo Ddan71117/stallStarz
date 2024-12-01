@@ -27,7 +27,17 @@ const RestroomCard: React.FC<RestroomCardProps> = ({
   name,
   distance,
   coordinates,
-  amenities = {}
+  amenities = {
+    wheelchairAccess: false,
+    flushToilet: false,
+    handwashing: false,
+    babyChanging: false,
+    unisex: false,
+    fee: false,
+    indoor: false,
+    maleFacilities: false,
+    femaleFacilities: false
+  }
 }) => {
   const getGoogleMapsUrl = () => {
     return `https://www.google.com/maps/dir/?api=1&destination=${coordinates.lat},${coordinates.lon}`;
@@ -78,6 +88,7 @@ const RestroomCard: React.FC<RestroomCardProps> = ({
             Get Directions
           </small>
         </a>
+
       </Card.Footer>
     </Card>
   );
