@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Restroom {
   id: string;
@@ -51,6 +51,8 @@ interface RestroomResponse {
 
 function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
   const [error, setError] = useState<string | null>(null);
+  // Add a ref to track if we've already fetched for these coordinates
+  const lastSearch = useRef<{lat: number, lon: number} | null>(null);
 
   const getAddress = async (lat: number, lon: number): Promise<string> => {
     try {
@@ -73,15 +75,24 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
 
   useEffect(() => {
     if (lat && lon) {
+      // Check if we've already fetched for these coordinates
+      if (lastSearch.current?.lat === lat && lastSearch.current?.lon === lon) {
+        return;
+      }
+
       const fetchRestrooms = async () => {
         setError(null);
         try {
           const query = `[out:json];
-            node["amenity"="toilets"](around:2000, ${lat}, ${lon});
-            out;`;
+            (
+              node["amenity"="toilets"](around:2000, ${lat}, ${lon});
+            );
+            out body 10;
+            >; out skel qt;`;
           const apiUrl = "https://overpass-api.de/api/interpreter";
           const url = `${apiUrl}?data=${encodeURIComponent(query)}`;
 
+          console.log(`Making API call for coordinates: lat=${lat}, lon=${lon}`);
           const response = await fetch(url);
 
           if (!response.ok) {
@@ -89,15 +100,14 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
           }
 
           const data: RestroomResponse = await response.json();
-          console.log("Raw API Response:", data);
-
-          // Process each restroom and get its address
+          
+          // Process only 10 restrooms
           const restroomsWithAddresses = await Promise.all(
-            data.elements.map(async (item) => {
+            data.elements.slice(0, 10).map(async (item) => {
               const address = await getAddress(item.lat, item.lon);
               return {
                 id: item.id.toString(),
-                name: item.tags.name || address, // Use address as fallback instead of coordinates
+                name: item.tags.name || address,
                 lat: item.lat,
                 lon: item.lon,
                 amenities: {
@@ -116,7 +126,9 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
             })
           );
 
-          console.log("Processed restrooms:", restroomsWithAddresses);
+          // Update last search coordinates
+          lastSearch.current = { lat, lon };
+          
           if (onRestroomsFound) {
             onRestroomsFound(restroomsWithAddresses);
           }
@@ -125,6 +137,7 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
           console.error("Error fetching restrooms:", error);
         }
       };
+
       fetchRestrooms();
     }
   }, [lat, lon, onRestroomsFound]);
