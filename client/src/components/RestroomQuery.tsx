@@ -92,7 +92,7 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
           const apiUrl = "https://overpass-api.de/api/interpreter";
           const url = `${apiUrl}?data=${encodeURIComponent(query)}`;
 
-          console.log(`Making API call for coordinates: lat=${lat}, lon=${lon}`);
+          console.log('Making Overpass API request to:', url);
           const response = await fetch(url);
 
           if (!response.ok) {
@@ -100,6 +100,9 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
           }
 
           const data: RestroomResponse = await response.json();
+
+          console.log("Overpass API Raw Response:", data);
+          console.log("Number of restrooms found:", data.elements.length);
           
           // Process only 10 restrooms
           const restroomsWithAddresses = await Promise.all(
