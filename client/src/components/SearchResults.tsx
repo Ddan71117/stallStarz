@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Row, Col, Alert, Pagination } from "react-bootstrap";
 import RestroomCard from "./RestroomCard";
 import RestroomQuery from "./RestroomQuery";
+// import ReviewsAndRatings from "./reviewsAndRatings"; Uncomment when ready to use.
 
 interface Geometry {
   lat: number;
@@ -42,7 +43,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   const [searchData, setSearchData] = useState<APIResult[]>([]);
   const [restroomData, setRestroomData] = useState<Restroom[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number } | null>(null);
+
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate pagination values
@@ -50,8 +55,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentRestrooms = restroomData.slice(startIndex, endIndex);
-
-
 
   const fetchData = useCallback(async () => {
     setError(null);
@@ -61,7 +64,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
 
       if (!query.trim()) return;
 
-      const url = `${apiUrl}?q=${encodeURIComponent(query)}&key=${apiKey}&limit=5`;
+      const url = `${apiUrl}?q=${encodeURIComponent(
+        query
+      )}&key=${apiKey}&limit=5`;
       console.log("Making request to:", url);
 
       const response = await fetch(url);
@@ -74,11 +79,24 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       console.log("API response data:", data);
 
       if (data.results && data.results.length > 0) {
-        setSearchData(data.results);
-        setSelectedLocation({
-          lat: data.results[0].geometry.lat,
-          lon: data.results[0].geometry.lng,
-        });
+        const results = data.results.map((item: APIResult, index: number) => ({
+          id: index.toString(),
+          title: item.formatted,
+          coordinates: {
+            lat: item.geometry.lat,
+            lon: item.geometry.lng,
+          },
+          amenities: {
+            wheelchairAccess: Math.random() > 0.5,
+            babyChanging: Math.random() > 0.5,
+            unisex: Math.random() > 0.5,
+          },
+          distance: `${(Math.random() * 5).toFixed(1)} miles`,
+        }));
+
+        console.log("Mapped results:", results);
+        setSearchData(results);
+        setSelectedLocation(results[0].coordinates);
       } else {
         setSearchData([]);
       }
@@ -102,7 +120,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const calculateDistance = (
@@ -128,14 +146,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
 
   return (
     <div className="p-4">
-      {error && (
-        <Alert variant="danger">{error}</Alert>
-      )}
-      
+      {error && <Alert variant="danger">{error}</Alert>}
+
       {!searchData.length && query && (
         <Alert variant="info">No locations found for your search.</Alert>
       )}
-      
+
       {!query && (
         <Alert variant="info">Enter a location to search for restrooms.</Alert>
       )}
@@ -156,15 +172,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       {totalPages > 1 && (
         <div className="d-flex justify-content-center mt-4">
           <Pagination>
-            <Pagination.First 
+            <Pagination.First
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1}
             />
-            <Pagination.Prev 
+            <Pagination.Prev
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             />
-            
+
             {/* Show page numbers */}
             {[...Array(totalPages)].map((_, index) => (
               <Pagination.Item
@@ -176,11 +192,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
               </Pagination.Item>
             ))}
 
-            <Pagination.Next 
+            <Pagination.Next
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             />
-            <Pagination.Last 
+            <Pagination.Last
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage === totalPages}
             />
@@ -189,8 +205,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       )}
 
       {selectedLocation && (
-        <RestroomQuery 
-          lat={selectedLocation.lat} 
+        <RestroomQuery
+          lat={selectedLocation.lat}
           lon={selectedLocation.lon}
           onRestroomsFound={handleRestroomsFound}
         />
