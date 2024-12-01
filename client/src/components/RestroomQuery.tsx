@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { calculateDistance } from '../utils/distance';
 
 interface Restroom {
   id: string;
   name: string;
   lat: number;
   lon: number;
+  distance: string;
   amenities: {
     wheelchairAccess: boolean;
     flushToilet: boolean;
@@ -108,11 +110,14 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
           const restroomsWithAddresses = await Promise.all(
             data.elements.slice(0, 10).map(async (item) => {
               const address = await getAddress(item.lat, item.lon);
+              const distance = calculateDistance(lat, lon, item.lat, item.lon);
+
               return {
                 id: item.id.toString(),
                 name: item.tags.name || address,
                 lat: item.lat,
                 lon: item.lon,
+                distance: distance,  // Add the calculated distance
                 amenities: {
                   wheelchairAccess: item.tags.wheelchair === 'yes',
                   flushToilet: item.tags['toilets:disposal'] === 'flush',
@@ -131,6 +136,8 @@ function RestroomQuery({ lat, lon, onRestroomsFound }: RestroomSearchProps) {
 
           // Update last search coordinates
           lastSearch.current = { lat, lon };
+          
+          console.log("Processed restrooms with distances:", restroomsWithAddresses); //debug code
           
           if (onRestroomsFound) {
             onRestroomsFound(restroomsWithAddresses);
