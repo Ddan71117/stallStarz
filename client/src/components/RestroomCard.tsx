@@ -1,5 +1,3 @@
-// Fetch user's restrooms cards to display on favorites page.
-
 import React from 'react';
 import { Card, Badge } from 'react-bootstrap';
 
@@ -11,35 +9,40 @@ interface RestroomCardProps {
     lat: number;
     lon: number;
   };
-  amenities?: {
-    wheelchairAccess?: boolean;
-    babyChanging?: boolean;
-    unisex?: boolean;
+  amenities: {
+    wheelchairAccess: boolean;
+    flushToilet: boolean;
+    handwashing: boolean;
+    babyChanging: boolean;
+    unisex: boolean;
+    fee: boolean;
+    indoor: boolean;
+    maleFacilities: boolean;
+    femaleFacilities: boolean;
   };
-  onClick: (coordinates: { lat: number; lon: number }) => void;
+  access?: string;
 }
 
 const RestroomCard: React.FC<RestroomCardProps> = ({
   name,
   distance,
   coordinates,
-  amenities = {},
-  onClick
+  amenities = {}
 }) => {
+  const getGoogleMapsUrl = () => {
+    return `https://www.google.com/maps/dir/?api=1&destination=${coordinates.lat},${coordinates.lon}`;
+  };
+
   return (
-    <Card 
-      onClick={() => onClick(coordinates)}
-      className="h-100 shadow-sm hover-card"
-      style={{ cursor: 'pointer' }}
-    >
+    <Card className="h-100 shadow-sm">
       <Card.Body>
         <Card.Title className="text-truncate">
-          {name}
+          {name || "Unnamed Location"}
         </Card.Title>
         <Card.Text>
           <div className="d-flex align-items-center mb-2">
             <i className="bi bi-geo-alt me-2"></i>
-            {distance || 'Distance not available'}
+            {distance || 'Distance unknown'}
           </div>
         </Card.Text>
         <div className="d-flex gap-2 flex-wrap">
@@ -64,7 +67,17 @@ const RestroomCard: React.FC<RestroomCardProps> = ({
         </div>
       </Card.Body>
       <Card.Footer className="text-muted">
-        <small>Click to view on map</small>
+        <a 
+          href={getGoogleMapsUrl()} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-decoration-none"
+        >
+          <small>
+            <i className="bi bi-map me-1"></i>
+            Get Directions
+          </small>
+        </a>
       </Card.Footer>
     </Card>
   );
