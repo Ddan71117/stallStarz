@@ -37,7 +37,7 @@ interface Restroom {
   access?: string;
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   const [searchData, setSearchData] = useState<APIResult[]>([]);
@@ -123,6 +123,27 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const calculateDistance = (
+  lat1: number, 
+  lon1: number, 
+  lat2: number, 
+  lon2: number
+): string => {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c * 0.621371; // Convert km to miles
+  
+  return `${distance.toFixed(1)} miles`;
+};
+
   return (
     <div className="p-4">
       {error && <Alert variant="danger">{error}</Alert>}
@@ -143,7 +164,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
               name={restroom.name}
               coordinates={{ lat: restroom.lat, lon: restroom.lon }}
               amenities={restroom.amenities}
-              onClick={handleLocationClick}
             />
           </Col>
         ))}
