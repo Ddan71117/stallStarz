@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Row, Col, Alert } from "react-bootstrap";
+import { Row, Col, Alert, Pagination } from "react-bootstrap";
 import RestroomCard from "./RestroomCard";
 import RestroomQuery from "./RestroomQuery";
 
@@ -17,22 +17,41 @@ interface SearchResultsProps {
   query: string;
 }
 
-interface Results {
+interface Restroom {
   id: string;
-  title: string;
-  coordinates: { lat: number; lon: number };
+  name: string;
+  lat: number;
+  lon: number;
   amenities: {
     wheelchairAccess: boolean;
+    flushToilet: boolean;
+    handwashing: boolean;
     babyChanging: boolean;
     unisex: boolean;
+    fee: boolean;
+    indoor: boolean;
+    maleFacilities: boolean;
+    femaleFacilities: boolean;
   };
-  distance: string;
+  access?: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
-  const [searchData, setSearchData] = useState<Results[]>([]);
+  const [searchData, setSearchData] = useState<APIResult[]>([]);
+  const [restroomData, setRestroomData] = useState<Restroom[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(restroomData.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentRestrooms = restroomData.slice(startIndex, endIndex);
+
+
 
   const fetchData = useCallback(async () => {
     setError(null);
@@ -55,24 +74,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       console.log("API response data:", data);
 
       if (data.results && data.results.length > 0) {
-        const results = data.results.map((item: APIResult, index: number) => ({
-          id: index.toString(),
-          title: item.formatted,
-          coordinates: {
-            lat: item.geometry.lat,
-            lon: item.geometry.lng,
-          },
-          amenities: {
-            wheelchairAccess: Math.random() > 0.5,
-            babyChanging: Math.random() > 0.5,
-            unisex: Math.random() > 0.5,
-          },
-          distance: `${(Math.random() * 5).toFixed(1)} miles`
-        }));
-
-        console.log("Mapped results:", results);
-        setSearchData(results);
-        setSelectedLocation(results[0].coordinates);
+        setSearchData(data.results);
+        setSelectedLocation({
+          lat: data.results[0].geometry.lat,
+          lon: data.results[0].geometry.lng,
+        });
       } else {
         setSearchData([]);
       }
@@ -90,6 +96,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
     setSelectedLocation(coordinates);
   };
 
+  const handleRestroomsFound = (restrooms: Restroom[]) => {
+    setRestroomData(restrooms);
+  };
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="p-4">
       {error && (
@@ -105,19 +120,61 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       )}
 
       <Row xs={1} md={2} lg={3} className="g-4 mb-4">
-        {searchData.map((result) => (
-          <Col key={result.id}>
+        {currentRestrooms.map((restroom) => (
+          <Col key={restroom.id}>
             <RestroomCard
-              id={result.id}
-              name={result.title}
-              coordinates={result.coordinates}
-              distance={result.distance}
-              amenities={result.amenities}
+              id={restroom.id}
+              name={restroom.name}
+              coordinates={{ lat: restroom.lat, lon: restroom.lon }}
+              amenities={restroom.amenities}
               onClick={handleLocationClick}
             />
           </Col>
         ))}
       </Row>
+
+      {totalPages > 1 && (
+        <div className="d-flex justify-content-center mt-4">
+          <Pagination>
+            <Pagination.First 
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            
+            {/* Show page numbers */}
+            {[...Array(totalPages)].map((_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={currentPage === index + 1}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+
+            <Pagination.Next 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+            <Pagination.Last 
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        </div>
+      )}
+
+      {selectedLocation && (
+        <RestroomQuery 
+          lat={selectedLocation.lat} 
+          lon={selectedLocation.lon}
+          onRestroomsFound={handleRestroomsFound}
+        />
+      )}
 
       <style>
         {`
@@ -126,6 +183,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
           }
           .hover-card:hover {
             transform: translateY(-5px);
+          }
+          .pagination {
+            margin-bottom: 2rem;
+          }
+          .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+          }
+          .page-link {
+            color: #0d6efd;
+            cursor: pointer;
           }
         `}
       </style>
