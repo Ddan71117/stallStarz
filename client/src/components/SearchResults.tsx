@@ -23,6 +23,7 @@ interface Restroom {
   name: string;
   lat: number;
   lon: number;
+  distance: string;
   amenities: {
     wheelchairAccess: boolean;
     flushToilet: boolean;
@@ -115,6 +116,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
   };
 
   const handleRestroomsFound = (restrooms: Restroom[]) => {
+      // Sort restrooms by distance
+  const sortedRestrooms = restrooms.sort((a, b) => {
+    // Convert distance strings to numbers for comparison
+    const distanceA = parseFloat(a.distance?.split(' ')[0] || '0');
+    const distanceB = parseFloat(b.distance?.split(' ')[0] || '0');
+    return distanceA - distanceB;  // Ascending order
+    });
     setRestroomData(restrooms);
   };
 
@@ -163,6 +171,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
               id={restroom.id}
               name={restroom.name}
               coordinates={{ lat: restroom.lat, lon: restroom.lon }}
+              distance={restroom.distance} 
               amenities={restroom.amenities}
             />
           </Col>

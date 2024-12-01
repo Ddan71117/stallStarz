@@ -22,7 +22,7 @@ interface RestroomCardProps {
     femaleFacilities: boolean;
   };
   access?: string;
-  onClick: (coordinates: { lat: number; lon: number }) => void;
+  //onClick: (coordinates: { lat: number; lon: number }) => void;
   averageRating?: number;
   totalReviews?: number;
 }
@@ -58,36 +58,72 @@ const RestroomCard: React.FC<RestroomCardProps> = ({
 
   return (
     <>
-      <Card className="h-100 shadow-sm">
-        <Card.Body>
-          <Card.Title className="text-truncate">
-            {name || "Unnamed Location"}
-          </Card.Title>
-          <Card.Text>
-            <div className="d-flex align-items-center mb-2">
-              <i className="bi bi-geo-alt me-2"></i>
-              {distance || "Distance unknown"}
-            </div>
-          </Card.Text>
-          <div className="d-flex gap-2 flex-wrap">
-            {amenities.wheelchairAccess && (
-              <Badge bg="primary">
-                <i className="bi bi-wheelchair me-1"></i>
-                Wheelchair Access
-              </Badge>
-            )}
-            {amenities.babyChanging && (
-              <Badge bg="success">
-                <i className="bi bi-person-arms-up me-1"></i>
-                Baby Changing
-              </Badge>
-            )}
-            {amenities.unisex && (
-              <Badge bg="info">
-                <i className="bi bi-gender-ambiguous me-1"></i>
-                Unisex
-              </Badge>
-            )}
+    <Card className="h-100 shadow-sm">
+      <Card.Body>
+        <Card.Title className="text-truncate">
+          {name || "Unnamed Location"}
+        </Card.Title>
+        <Card.Text>
+          <div className="d-flex align-items-center mb-2">
+            <i className="bi bi-geo-alt me-2"></i>
+            {distance || "Distance unknown"}
+          </div>
+        </Card.Text>
+        <div className="d-flex gap-2 flex-wrap">
+          {amenities.wheelchairAccess && (
+            <Badge bg="primary">
+              <i className="bi bi-wheelchair me-1"></i>
+              Wheelchair Access
+            </Badge>
+          )}
+          {amenities.flushToilet && (
+            <Badge bg="secondary">
+              <i className="bi bi-water me-1"></i>
+              Flush Toilet
+            </Badge>
+          )}
+          {amenities.handwashing && (
+            <Badge bg="info">
+              <i className="bi bi-droplet me-1"></i>
+              Hand Washing
+            </Badge>
+          )}
+          {amenities.babyChanging && (
+            <Badge bg="success">
+              <i className="bi bi-person-arms-up me-1"></i>
+              Baby Changing
+            </Badge>
+          )}
+          {amenities.unisex && (
+            <Badge bg="info">
+              <i className="bi bi-gender-ambiguous me-1"></i>
+              Unisex
+            </Badge>
+          )}
+          {amenities.fee && (
+            <Badge bg="warning">
+              <i className="bi bi-currency-dollar me-1"></i>
+              Paid
+            </Badge>
+          )}
+          {amenities.indoor && (
+            <Badge bg="dark">
+              <i className="bi bi-building me-1"></i>
+              Indoor
+            </Badge>
+          )}
+          {amenities.maleFacilities && (
+            <Badge bg="primary">
+              <i className="bi bi-gender-male me-1"></i>
+              Men's Room
+            </Badge>
+          )}
+          {amenities.femaleFacilities && (
+            <Badge bg="danger">
+              <i className="bi bi-gender-female me-1"></i>
+              Women's Room
+            </Badge>
+          )}
           </div>
         </Card.Body>
         <Card.Footer className="bg-transparent">
