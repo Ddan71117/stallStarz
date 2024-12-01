@@ -164,6 +164,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
         <Alert variant="info">Enter a location to search for restrooms.</Alert>
       )}
 
+      {restroomData.length > 0 && query && (
+      <div className="mb-4 text-muted">
+        <h6>Found {restroomData.length} restrooms near {query}.</h6>
+      </div>
+      )}
+
       <Row xs={1} md={2} lg={3} className="g-4 mb-4">
         {currentRestrooms.map((restroom) => (
           <Col key={restroom.id}>
@@ -179,7 +185,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       </Row>
 
       {totalPages > 1 && (
-        <div className="d-flex justify-content-center mt-4">
+        <div className="d-flex justify-content-center pagination-container">
           <Pagination>
             <Pagination.First
               onClick={() => handlePageChange(1)}
@@ -222,25 +228,45 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
       )}
 
       <style>
-        {`
-          .hover-card {
-            transition: transform 0.2s ease-in-out;
-          }
-          .hover-card:hover {
-            transform: translateY(-5px);
+      {`
+        .hover-card {
+          transition: transform 0.2s ease-in-out;
+        }
+        .hover-card:hover {
+          transform: translateY(-5px);
+        }
+        .pagination-container {
+          margin: 2rem 0 5rem 0;
+          padding-bottom: 1rem;
+          position: relative;    // Add this
+          z-index: 1;           // Add this - lower z-index than footer
+        }
+        .pagination {
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+        .page-item {
+          z-index: 1;           // Add this
+        }
+        .page-item.active .page-link {
+          background-color: #0d6efd;
+          border-color: #0d6efd;
+          z-index: 1;           // Add this
+        }
+        .page-link {
+          color: #0d6efd;
+          cursor: pointer;
+          z-index: 1;           // Add this
+        }
+        @media (max-width: 768px) {
+          .pagination-container {
+            margin-bottom: 6rem;
           }
           .pagination {
-            margin-bottom: 2rem;
+            padding: 0 1rem;
           }
-          .page-item.active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-          }
-          .page-link {
-            color: #0d6efd;
-            cursor: pointer;
-          }
-        `}
+    `}
       </style>
     </div>
   );
