@@ -7,8 +7,7 @@ const SearchAndListing = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const buttonStyle = {
-    background: 'rgb(105,11,62)',
-    backgroundImage: 'linear-gradient(90deg, rgba(105,11,62,1) 0%, rgba(95,50,68,1) 11%, rgba(22,72,92,1) 36%, rgba(18,73,93,1) 55%, rgba(245,134,36,1) 80%, rgba(105,11,62,1) 100%)',
+    background: '#1f2020',
     border: 'none',
     color: 'white',
     transition: 'opacity 0.3s ease'

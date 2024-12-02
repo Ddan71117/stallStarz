@@ -73,6 +73,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
+
 export const verifyToken = async (req: Request, res: Response): Promise<Response> => {
   try {
     const authHeader = req.headers.authorization;

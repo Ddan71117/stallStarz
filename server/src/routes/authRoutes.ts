@@ -2,11 +2,11 @@ import express from 'express';
 import { login, signup, verifyToken } from '../controllers/authController';
 import { auth } from '../middleware/auth';
 
-const router = express.Router();
+const authRouter = express.Router();
 
 // Auth routes
-router.post('/signup', signup);
-router.post('/login', login);
-router.get('/verify', auth, verifyToken);
+authRouter.post('/signup', signup);
+authRouter.post('/login', login);
+authRouter.get('/verify', auth, verifyToken);
 
-export default router;
+export default authRouter;
