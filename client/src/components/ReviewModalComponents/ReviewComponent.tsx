@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { FetchGitHubEmojis } from "./FetchGitHubEmojis";
+import { ListGroup } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 // Define the structure of a review
 export interface Review {
@@ -29,30 +31,29 @@ export const ReviewComponent = ({
   }, []);
 
   return (
-    <div>
+    <ListGroup>
       {reviews.map((review, index) => (
-        <div key={index}>
-          {/* Render the title and content of each review */}
+        <ListGroup.Item
+          key={index}
+          style={{ backgroundColor: "#16485C", color: "#FFFFFF" }}
+        >
           <h5>{review.title}</h5>
           <p>{review.content}</p>
-          <div style={{ display: "flex", gap: "10px" }}>
-            {/* Render buttons for each emoji with counts */}
+          <div>
             {Object.entries(review.emojis).map(([emoji, count]) => (
-              <button
+              <Button
                 key={emoji}
+                variant="outline-light"
+                size="sm"
+                className="m-1"
                 onClick={() => onReact(index, emoji as keyof Review["emojis"])}
               >
-                <img
-                  src={emojiUrl[emoji]}
-                  alt={emoji}
-                  style={{ width: 20, height: 20 }}
-                />{" "}
-                {count} {/* Show emoji and count */}
-              </button>
+                {emoji} {count}
+              </Button>
             ))}
           </div>
-        </div>
+        </ListGroup.Item>
       ))}
-    </div>
+    </ListGroup>
   );
 };
