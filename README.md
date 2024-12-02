@@ -14,6 +14,8 @@ StallStarz is a user-friendly web application designed to help users find nearby
 6. [Project Structure](#project-structure)
 7. [Authentication](#authentication)
 8. [API Routes](#api-routes)
+9. [License](#License)
+10. [Contact Information](#Contact-Information)
 
 ## Features
 - User authentication (signup/login)
