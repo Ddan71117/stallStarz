@@ -45,16 +45,8 @@ StallStarz is a user-friendly web application designed to help users find nearby
 - Google Maps for directions
 
 ## Screenshots
-[Add actual screenshots of your application here]
-- Login Page
-![alt text](image.png)
-- Sign Up Page
-![alt text](image-1.png)
-- Search Page
-![alt text](image-2.png)
-- Restroom Listings
-![alt text](image-3.png)
-- Rating and Review View
+![alt text](image.png) ![alt text](image-1.png)
+![alt text](image-2.png) ![alt text](image-3.png)
 
 ## Getting Started
 1. Clone the repository
