@@ -27,6 +27,15 @@ export const ListingContainer = ({
     }))
   );
 
+  useEffect(() => {
+    setReviews(
+      listing.reviews.map((review) => ({
+        ...review,
+        emojis: { "👍": 0, "👎": 0, "✨": 0, "💩": 0 },
+      }))
+    );
+  }, [listing]);
+
   // Handle emoji reaction button clicks
   const handleReact = (reviewIndex: number, emoji: keyof Review["emojis"]) => {
     setReviews((prevReviews: any) => {
