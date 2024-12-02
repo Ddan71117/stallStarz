@@ -9,9 +9,14 @@ interface Geometry {
   lng: number;
 }
 
+interface Annotations {
+  geohash: string;
+}
+
 interface APIResult {
   formatted: string;
   geometry: Geometry;
+  annotations: Annotations;
 }
 
 interface SearchResultsProps {
@@ -81,7 +86,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query }) => {
 
       if (data.results && data.results.length > 0) {
         const results = data.results.map((item: APIResult, index: number) => ({
-          id: index.toString(),
+          id: item.annotations.geohash,
           title: item.formatted,
           coordinates: {
             lat: item.geometry.lat,
