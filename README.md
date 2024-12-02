@@ -1,6 +1,6 @@
 # StallStarz - Restroom Finder Application 🚻
 
-StallStarz is a user-friendly web application designed to help users find nearby public restrooms with detailed amenity information and directions.
+StallStarz is a user-friendly web application designed to help users find nearby public restrooms. Listings include detailed amenity information and directions. Users also have the ability to rate and review public restrooms.
 
 ## Live Demo
 [Visit StallStarz](https://stallstarz.onrender.com)
@@ -25,6 +25,7 @@ StallStarz is a user-friendly web application designed to help users find nearby
 - Integrated directions via Google Maps
 - Mobile responsive design
 - Pagination for search results
+- Review and ratings functionality
 
 ## Technologies Used
 - **Frontend**:
@@ -124,8 +125,9 @@ stallstarz/
 ## License
 MIT License
 
-## Contact Information
+## Contact and Authorship Information
 
 For support or inquiries:
-- Developer: Daniel Drennen, Parker Miksell, Morgan, Calvin Irwin and Amit Nandy
+- Developers: Daniel Drennen, Parker Mikesell, Morgan Troper, Calvin Irwin and Amit Nandy
+- Additional code sourced from ChatGPT
 - GitHub: https://github.com/Ddan71117
